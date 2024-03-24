@@ -18,6 +18,26 @@ class SpotifyClient:
     # Add methods to interact with the Spotify API here
     def get_current_user_profile(self):
         return self.sp.current_user()
+    
+    def get_playlist_tracks_with_cover_art(self, playlist_id):
+        tracks_with_cover_art = []
+        results = self.sp.playlist_items(playlist_id)
+        tracks = results['items']
+        while results['next']:
+            results = self.sp.next(results)
+            tracks.extend(results['items'])
+        
+        for track in tracks:
+            track_info = track['track']
+            album = track_info['album']
+            cover_art_url = album['images'][0]['url']  # Assuming the first image is the cover art
+            tracks_with_cover_art.append({
+                'id': track_info['id'],
+                'name': track_info['name'],
+                'cover_art_url': cover_art_url
+            })
+        
+        return tracks_with_cover_art
 
 if __name__ == '__main__':
     # Initialize the SpotifyClient
